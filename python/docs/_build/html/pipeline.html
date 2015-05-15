@@ -1,0 +1,691 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hello there! &mdash; appengine-pipelines 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="appengine-pipelines 1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to appengine-pipelines’s documentation!" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to appengine-pipelines’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">appengine-pipelines 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-pipeline.pipeline">
+<span id="hello-there"></span><h1>Hello there!<a class="headerlink" href="#module-pipeline.pipeline" title="Permalink to this headline">¶</a></h1>
+<p>Google App Engine Pipeline API for complex, asynchronous workflows.</p>
+<dl class="exception">
+<dt id="pipeline.pipeline.Error">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">Error</code><a class="reference internal" href="_modules/pipeline/pipeline.html#Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for exceptions in this module.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.PipelineSetupError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">PipelineSetupError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#PipelineSetupError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.PipelineSetupError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for exceptions that happen before Pipeline execution.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.PipelineExistsError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">PipelineExistsError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#PipelineExistsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.PipelineExistsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A new Pipeline with an assigned idempotence_key cannot be overwritten.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.PipelineRuntimeError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">PipelineRuntimeError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#PipelineRuntimeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.PipelineRuntimeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for exceptions that happen during Pipeline execution.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.SlotNotFilledError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">SlotNotFilledError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#SlotNotFilledError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.SlotNotFilledError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A slot that should have been filled already was not yet filled.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.SlotNotDeclaredError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">SlotNotDeclaredError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#SlotNotDeclaredError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.SlotNotDeclaredError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A slot that was filled or passed along was not previously declared.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.UnexpectedPipelineError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">UnexpectedPipelineError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#UnexpectedPipelineError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.UnexpectedPipelineError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An assertion failed, potentially leaving the pipeline unable to proceed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.PipelineStatusError">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">PipelineStatusError</code><a class="reference internal" href="_modules/pipeline/pipeline.html#PipelineStatusError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.PipelineStatusError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions raised when trying to collect pipeline status.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.pipeline.Slot">
+<em class="property">class </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">Slot</code><span class="sig-paren">(</span><em>name=None</em>, <em>slot_key=None</em>, <em>strict=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Slot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Slot" title="Permalink to this definition">¶</a></dt>
+<dd><p>An output that is filled by a Pipeline as it executes.</p>
+<dl class="attribute">
+<dt id="pipeline.pipeline.Slot.fill_datetime">
+<code class="descname">fill_datetime</code><a class="headerlink" href="#pipeline.pipeline.Slot.fill_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns when the slot was filled.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>A datetime.datetime.</dd>
+<dt>Raises:</dt>
+<dd>SlotNotFilledError if the value hasn&#8217;t been filled yet.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Slot.filler">
+<code class="descname">filler</code><a class="headerlink" href="#pipeline.pipeline.Slot.filler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pipeline ID that filled this slot&#8217;s value.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>A string that is the pipeline ID.</dd>
+<dt>Raises:</dt>
+<dd>SlotNotFilledError if the value hasn&#8217;t been filled yet.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Slot.value">
+<code class="descname">value</code><a class="headerlink" href="#pipeline.pipeline.Slot.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current value of this slot.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>The value of the slot (a serializable Python type).</dd>
+<dt>Raises:</dt>
+<dd>SlotNotFilledError if the value hasn&#8217;t been filled yet.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.pipeline.Pipeline">
+<em class="property">class </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">Pipeline</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Pipeline function-object that performs operations and has a life cycle.</p>
+<dl class="docutils">
+<dt>Class properties (to be overridden by sub-classes):</dt>
+<dd><dl class="first last docutils">
+<dt>async: When True, this Pipeline will execute asynchronously and fill the</dt>
+<dd>default output slot itself using the complete() method.</dd>
+<dt>output_names: List of named outputs (in addition to the default slot) that</dt>
+<dd>this Pipeline must output to (no more, no less).</dd>
+<dt>public_callbacks: If the callback URLs generated for this class should be</dt>
+<dd>accessible by all external requests regardless of login or task queue.</dd>
+<dt>admin_callbacks: If the callback URLs generated for this class should be</dt>
+<dd>accessible by the task queue ane externally by users logged in as admins.</dd>
+<dt>class_path: String identifier for this Pipeline, which is derived from</dt>
+<dd>its path in the global system modules dictionary.</dd>
+</dl>
+</dd>
+<dt>Modifiable instance properties:</dt>
+<dd><dl class="first last docutils">
+<dt>backoff_seconds: How many seconds to use as the constant factor in</dt>
+<dd>exponential backoff; may be changed by the user.</dd>
+<dt>backoff_factor: Base factor to use for exponential backoff. The formula</dt>
+<dd>followed is (backoff_seconds * backoff_factor^current_attempt).</dd>
+<dt>max_attempts: Maximum number of retry attempts to make before failing</dt>
+<dd>completely and aborting the entire pipeline up to the root.</dd>
+<dt>target: The application version to use for processing this Pipeline. This</dt>
+<dd>can be set to the name of a backend to direct Pipelines to run there.</dd>
+</dl>
+</dd>
+<dt>Instance properties:</dt>
+<dd>pipeline_id: The ID of this pipeline.
+root_pipeline_id: The ID of the root of this pipeline.
+queue_name: The queue this pipeline runs on or None if unknown.
+current_attempt: The current attempt being tried for this pipeline.</dd>
+</dl>
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.abort">
+<code class="descname">abort</code><span class="sig-paren">(</span><em>abort_message=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.abort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.abort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark the entire pipeline up to the root as aborted.</p>
+<p>Note this should only be called from <em>outside</em> the context of a running
+pipeline. Synchronous and generator pipelines should raise the &#8216;Abort&#8217;
+exception to cause this behavior during execution.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>abort_message: Optional message explaining why the abort happened.</dd>
+<dt>Returns:</dt>
+<dd>True if the abort signal was sent successfully; False if the pipeline
+could not be aborted for any reason.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.base_path">
+<code class="descname">base_path</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.base_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the base path for Pipeline URL handlers or None if unknown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.callback">
+<code class="descname">callback</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>This Pipeline received an asynchronous callback request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean up this Pipeline and all Datastore records used for coordination.</p>
+<p>Only works when called on a root pipeline. Child pipelines will ignore
+calls to this method.</p>
+<p>After this method is called, Pipeline.from_id() and related status
+methods will return inconsistent or missing results. This method is
+fire-and-forget and asynchronous.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.complete">
+<code class="descname">complete</code><span class="sig-paren">(</span><em>default_output=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks this asynchronous Pipeline as complete.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>default_output: What value the &#8216;default&#8217; output slot should be assigned.</dd>
+<dt>Raises:</dt>
+<dd>UnexpectedPipelineError if the slot no longer exists or this method was
+called for a pipeline that is not async.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.current_attempt">
+<code class="descname">current_attempt</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.current_attempt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current attempt at running this pipeline, starting at 1.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.fill">
+<code class="descname">fill</code><span class="sig-paren">(</span><em>name_or_slot</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.fill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.fill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills an output slot required by this Pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>name_or_slot: The name of the slot (a string) or Slot record to fill.
+value: The serializable value to assign to this slot.</dd>
+<dt>Raises:</dt>
+<dd>UnexpectedPipelineError if the Slot no longer exists. SlotNotDeclaredError
+if trying to output to a slot that was not declared ahead of time.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.finalized">
+<code class="descname">finalized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.finalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.finalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalizes this Pipeline after execution if it&#8217;s a generator.</p>
+<p>Default action as the root pipeline is to email the admins with the status.
+Implementors be sure to call &#8216;was_aborted&#8217; to find out if the finalization
+that you&#8217;re handling is for a success or error case.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.finalized_test">
+<code class="descname">finalized_test</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.finalized_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.finalized_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalized this Pipeline in test mode.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pipeline.pipeline.Pipeline.from_id">
+<em class="property">classmethod </em><code class="descname">from_id</code><span class="sig-paren">(</span><em>pipeline_id</em>, <em>resolve_outputs=True</em>, <em>_pipeline_record=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.from_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instance corresponding to an existing Pipeline.</p>
+<p>The returned object will have the same properties a Pipeline does while
+it&#8217;s running synchronously (e.g., like what it&#8217;s first allocated), allowing
+callers to inspect caller arguments, outputs, fill slots, complete the
+pipeline, abort, retry, etc.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">pipeline_id: The ID of this pipeline (a string).
+resolve_outputs: When True, dereference the outputs of this Pipeline</p>
+<blockquote>
+<div>so their values can be accessed by the caller.</div></blockquote>
+<dl class="last docutils">
+<dt>_pipeline_record: Internal-only. The _PipelineRecord instance to use</dt>
+<dd>to instantiate this instance instead of fetching it from
+the datastore.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>Pipeline sub-class instances or None if it could not be found.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.get_callback_task">
+<code class="descname">get_callback_task</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.get_callback_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.get_callback_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a task for calling back this Pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>params: Keyword argument containing a dictionary of key/value pairs</dt>
+<dd>that will be passed to the callback when it is executed.</dd>
+<dt>args, kwargs: Passed to the taskqueue.Task constructor. Use these</dt>
+<dd>arguments to set the task name (for idempotence), etc.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>A taskqueue.Task instance that must be enqueued by the caller.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.get_callback_url">
+<code class="descname">get_callback_url</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.get_callback_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.get_callback_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a relative URL for invoking this Pipeline&#8217;s callback method.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>kwargs: Dictionary mapping keyword argument names to single values that</dt>
+<dd>should be passed to the callback when it is invoked.</dd>
+</dl>
+</dd>
+<dt>Raises:</dt>
+<dd>UnexpectedPipelineError if this is invoked on pipeline that is not async.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.has_finalized">
+<code class="descname">has_finalized</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.has_finalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if this pipeline has completed and finalized.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.is_root">
+<code class="descname">is_root</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.is_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if this pipeline is a root pipeline, False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.pipeline_id">
+<code class="descname">pipeline_id</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.pipeline_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ID of this Pipeline as a string or None if unknown.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.queue_name">
+<code class="descname">queue_name</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.queue_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the queue name this Pipeline runs on or None if unknown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.retry">
+<code class="descname">retry</code><span class="sig-paren">(</span><em>retry_message=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forces a currently running asynchronous pipeline to retry.</p>
+<p>Note this may not be called by synchronous or generator pipelines. Those
+must instead raise the &#8216;Retry&#8217; exception during execution.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>retry_message: Optional message explaining why the retry happened.</dd>
+<dt>Returns:</dt>
+<dd>True if the Pipeline should be retried, False if it cannot be cancelled
+mid-flight for some reason.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.root_pipeline_id">
+<code class="descname">root_pipeline_id</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.root_pipeline_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns root pipeline ID as a websafe string or None if unknown.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs this Pipeline.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.run_test">
+<code class="descname">run_test</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.run_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.run_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs this Pipeline in test mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.send_result_email">
+<code class="descname">send_result_email</code><span class="sig-paren">(</span><em>sender=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.send_result_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.send_result_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends an email to admins indicating this Pipeline has completed.</p>
+<p>For developer convenience. Automatically called from finalized for root
+Pipelines that do not override the default action.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>sender: (optional) Override the sender&#8217;s email address.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.set_status">
+<code class="descname">set_status</code><span class="sig-paren">(</span><em>message=None</em>, <em>console_url=None</em>, <em>status_links=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.set_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.set_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the current status of this pipeline.</p>
+<p>This method is purposefully non-transactional. Updates are written to the
+datastore immediately and overwrite all existing statuses.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">message: (optional) Overall status message.
+console_url: (optional) Relative URL to use for the &#8220;console&#8221; of this</p>
+<blockquote>
+<div>pipeline that displays current progress. When None, no console will
+be displayed.</div></blockquote>
+<dl class="last docutils">
+<dt>status_links: (optional) Dictionary of readable link names to relative</dt>
+<dd>URLs that should be associated with this pipeline as it runs. These links
+provide convenient access to other dashboards, consoles, etc associated
+with the pipeline.</dd>
+</dl>
+</dd>
+<dt>Raises:</dt>
+<dd>PipelineRuntimeError if the status could not be set for any reason.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>idempotence_key=''</em>, <em>queue_name='default'</em>, <em>base_path='/_ah/pipeline'</em>, <em>return_task=False</em>, <em>countdown=None</em>, <em>eta=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a new instance of this pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>idempotence_key: The ID to use for this Pipeline and throughout its</dt>
+<dd>asynchronous workflow to ensure the operations are idempotent. If
+empty a starting key will be automatically assigned.</dd>
+</dl>
+<p>queue_name: What queue this Pipeline&#8217;s workflow should execute on.
+base_path: The relative URL path to where the Pipeline API is</p>
+<blockquote>
+<div>mounted for access by the taskqueue API or external requests.</div></blockquote>
+<dl class="last docutils">
+<dt>return_task: When True, a task to start this pipeline will be returned</dt>
+<dd>instead of submitted, allowing the caller to start off this pipeline
+as part of a separate transaction (potentially leaving this newly
+allocated pipeline&#8217;s datastore entities in place if that separate
+transaction fails for any reason).</dd>
+<dt>countdown: Time in seconds into the future that this Task should execute.</dt>
+<dd>Defaults to zero.</dd>
+<dt>eta: A datetime.datetime specifying the absolute time at which the task</dt>
+<dd>should be executed. Must not be specified if &#8216;countdown&#8217; is specified.
+This may be timezone-aware or timezone-naive. If None, defaults to now.
+For pull tasks, no worker will be able to lease this task before the
+time indicated by eta.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>A taskqueue.Task instance if return_task was True. This task will <em>not</em>
+have a name, thus to ensure reliable execution of your pipeline you
+should add() this task as part of a separate Datastore transaction.</dd>
+<dt>Raises:</dt>
+<dd>PipelineExistsError if the pipeline with the given idempotence key exists.
+PipelineSetupError if the pipeline could not start for any other reason.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.start_test">
+<code class="descname">start_test</code><span class="sig-paren">(</span><em>idempotence_key=None</em>, <em>base_path=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.start_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.start_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts this pipeline in test fashion.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>idempotence_key: Dummy idempotence_key to use for this root pipeline.
+base_path: Dummy base URL path to use for this root pipeline.
+kwargs: Ignored keyword arguments usually passed to start().</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.test_mode">
+<code class="descname">test_mode</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.test_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the pipeline is running in test mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.try_cancel">
+<code class="descname">try_cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.try_cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.try_cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This pipeline has been cancelled.</p>
+<p>Called when a pipeline is interrupted part-way through due to some kind
+of failure (an abort of the whole pipeline to the root or a forced retry on
+this child pipeline).</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>True to indicate that cancellation was successful and this pipeline may
+go in the retry or aborted state; False to indicate that this pipeline
+cannot be canceled right now and must remain as-is.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pipeline.pipeline.Pipeline.was_aborted">
+<code class="descname">was_aborted</code><a class="headerlink" href="#pipeline.pipeline.Pipeline.was_aborted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if this pipeline was aborted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pipeline.pipeline.Pipeline.with_params">
+<code class="descname">with_params</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#Pipeline.with_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Pipeline.with_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify various execution parameters of a Pipeline before it runs.</p>
+<p>This method has no effect in test mode.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>kwargs: Attributes to modify on this Pipeline instance before it has</dt>
+<dd>been executed.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>This Pipeline instance, for easy chaining.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.pipeline.PipelineFuture">
+<em class="property">class </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">PipelineFuture</code><span class="sig-paren">(</span><em>output_names</em>, <em>force_strict=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#PipelineFuture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.PipelineFuture" title="Permalink to this definition">¶</a></dt>
+<dd><p>A future for accessing the outputs of a Pipeline.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.pipeline.After">
+<em class="property">class </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">After</code><span class="sig-paren">(</span><em>*futures</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#After"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.After" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes all contained Pipelines to run after the given ones complete.</p>
+<p>Must be used in a &#8216;with&#8217; block.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.pipeline.InOrder">
+<em class="property">class </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">InOrder</code><a class="reference internal" href="_modules/pipeline/pipeline.html#InOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.InOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes all contained Pipelines to run in order.</p>
+<p>Must be used in a &#8216;with&#8217; block.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.Retry">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">Retry</code><a class="reference internal" href="_modules/pipeline/pipeline.html#Retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>The currently running pipeline should be retried at a later time.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pipeline.pipeline.Abort">
+<em class="property">exception </em><code class="descclassname">pipeline.pipeline.</code><code class="descname">Abort</code><a class="reference internal" href="_modules/pipeline/pipeline.html#Abort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.Abort" title="Permalink to this definition">¶</a></dt>
+<dd><p>The currently running pipeline should be aborted up to the root.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pipeline.pipeline.get_status_tree">
+<code class="descclassname">pipeline.pipeline.</code><code class="descname">get_status_tree</code><span class="sig-paren">(</span><em>root_pipeline_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#get_status_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.get_status_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the full status tree of a pipeline.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>root_pipeline_id: The pipeline ID to get status for.</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>Dictionary with the keys:</dt>
+<dd>rootPipelineId: The ID of the root pipeline.
+slots: Mapping of slot IDs to result of from _get_internal_slot.
+pipelines: Mapping of pipeline IDs to result of _get_internal_status.</dd>
+</dl>
+</dd>
+<dt>Raises:</dt>
+<dd>PipelineStatusError if any input is bad.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pipeline.pipeline.get_pipeline_names">
+<code class="descclassname">pipeline.pipeline.</code><code class="descname">get_pipeline_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#get_pipeline_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.get_pipeline_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the class paths of all Pipelines defined in alphabetical order.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pipeline.pipeline.get_root_list">
+<code class="descclassname">pipeline.pipeline.</code><code class="descname">get_root_list</code><span class="sig-paren">(</span><em>class_path=None</em>, <em>cursor=None</em>, <em>count=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#get_root_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.get_root_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a list root Pipelines.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>class_path: Optional. If supplied, only return root Pipelines with the</dt>
+<dd>given class_path. By default all root pipelines are returned.</dd>
+<dt>cursor: Optional. When supplied, the cursor returned from the last call to</dt>
+<dd>get_root_list which indicates where to pick up.</dd>
+</dl>
+<p class="last">count: How many pipeline returns to return.</p>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>Dictionary with the keys:</dt>
+<dd><dl class="first last docutils">
+<dt>pipelines: The list of Pipeline records in the same format as</dt>
+<dd>returned by get_status_tree, but with only the roots listed.</dd>
+<dt>cursor: Cursor to pass back to this function to resume the query. Will</dt>
+<dd>only be present if there is another page of results.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt>
+<dd>PipelineStatusError if any input is bad.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pipeline.pipeline.create_handlers_map">
+<code class="descclassname">pipeline.pipeline.</code><code class="descname">create_handlers_map</code><span class="sig-paren">(</span><em>prefix='.*'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#create_handlers_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.create_handlers_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new handlers map.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>prefix: url prefix to use.</dd>
+<dt>Returns:</dt>
+<dd>list of (regexp, handler) pairs for WSGIApplication constructor.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pipeline.pipeline.set_enforce_auth">
+<code class="descclassname">pipeline.pipeline.</code><code class="descname">set_enforce_auth</code><span class="sig-paren">(</span><em>new_status</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/pipeline.html#set_enforce_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.pipeline.set_enforce_auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets whether Pipeline API handlers rely on app.yaml for access control.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>new_status: If True, then the Pipeline API will enforce its own</dt>
+<dd>access control on status and static file handlers. If False, then
+it will assume app.yaml is doing the enforcement.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-pipeline.models"></span><p>Datastore models used by the Google App Engine Pipeline API.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to appengine-pipelines&#8217;s documentation!</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pipeline.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, some text.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/pipeline.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

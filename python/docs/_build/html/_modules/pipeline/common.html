@@ -1,0 +1,527 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pipeline.common &mdash; appengine-pipelines 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="appengine-pipelines 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">appengine-pipelines 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pipeline.common</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#</span>
+<span class="c"># Copyright 2010 Google Inc.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Common Pipelines for easy reuse.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">cgi</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">mail</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">taskqueue</span>
+
+<span class="kn">import</span> <span class="nn">pipeline</span>
+
+
+<div class="viewcode-block" id="Return"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Return">[docs]</a><span class="k">class</span> <span class="nc">Return</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Causes calling generator to have the supplied default output value.</span>
+
+<span class="sd">  Only works when yielded last!</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">return_value</span>
+
+</div>
+<div class="viewcode-block" id="Ignore"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Ignore">[docs]</a><span class="k">class</span> <span class="nc">Ignore</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Mark the supplied parameters as unused outputs of sibling pipelines.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="Dict"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Dict">[docs]</a><span class="k">class</span> <span class="nc">Dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns a dictionary with the supplied keyword arguments.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="List"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.List">[docs]</a><span class="k">class</span> <span class="nc">List</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns a list with the supplied positional arguments.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="AbortIfTrue"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.AbortIfTrue">[docs]</a><span class="k">class</span> <span class="nc">AbortIfTrue</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Aborts the entire pipeline if the supplied argument is True.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Abort</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="All"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.All">[docs]</a><span class="k">class</span> <span class="nc">All</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns True if all of the values are True.</span>
+
+<span class="sd">  Returns False if there are no values present.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="Any"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Any">[docs]</a><span class="k">class</span> <span class="nc">Any</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns True if any of the values are True.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+
+</div>
+<div class="viewcode-block" id="Complement"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Complement">[docs]</a><span class="k">class</span> <span class="nc">Complement</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns the boolean complement of the values.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="k">return</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[</span><span class="ow">not</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="Max"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Max">[docs]</a><span class="k">class</span> <span class="nc">Max</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns the max value.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;max expected at least 1 argument, got 0&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Min"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Min">[docs]</a><span class="k">class</span> <span class="nc">Min</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns the min value.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;min expected at least 1 argument, got 0&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Sum"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Sum">[docs]</a><span class="k">class</span> <span class="nc">Sum</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns the sum of all values.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;sum expected at least 1 argument, got 0&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Multiply"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Multiply">[docs]</a><span class="k">class</span> <span class="nc">Multiply</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns all values multiplied together.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;multiply expected at least 1 argument, got 0&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="n">total</span> <span class="o">*=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">total</span>
+
+</div>
+<div class="viewcode-block" id="Negate"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Negate">[docs]</a><span class="k">class</span> <span class="nc">Negate</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns each value supplied multiplied by -1.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;negate expected at least 1 argument, got 0&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="Extend"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Extend">[docs]</a><span class="k">class</span> <span class="nc">Extend</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Combine together lists and tuples into a single list.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    *args: One or more lists or tuples.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A single list of all supplied lists merged together in order. Length of</span>
+<span class="sd">    the output list is the sum of the lengths of all input lists.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="n">combined</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">combined</span>
+
+</div>
+<div class="viewcode-block" id="Append"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Append">[docs]</a><span class="k">class</span> <span class="nc">Append</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Combine together values into a list.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    *args: One or more values.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A single list of all values appended to the same list. Length of the</span>
+<span class="sd">    output list matches the length of the input list.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="n">combined</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">combined</span>
+
+</div>
+<div class="viewcode-block" id="Concat"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Concat">[docs]</a><span class="k">class</span> <span class="nc">Concat</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Concatenates strings together using a join character.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    *args: One or more strings.</span>
+<span class="sd">    separator: Keyword argument only; the string to use to join the args.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The joined string.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">separator</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;separator&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Union"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Union">[docs]</a><span class="k">class</span> <span class="nc">Union</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Like Extend, but the resulting list has all unique elements.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="n">combined</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Intersection"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Intersection">[docs]</a><span class="k">class</span> <span class="nc">Intersection</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns only those items belonging to all of the supplied lists.</span>
+
+<span class="sd">  Each argument must be a list. No individual items are permitted.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+      <span class="n">result</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Uniquify"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Uniquify">[docs]</a><span class="k">class</span> <span class="nc">Uniquify</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns a list of unique items from the list of items supplied.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="Format"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Format">[docs]</a><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Formats a string with formatting arguments.&quot;&quot;&quot;</span>
+
+  <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Format.dict"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Format.dict">[docs]</a>  <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">format_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Formats a dictionary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      message: The format string.</span>
+<span class="sd">      **format_dict: Keyword arguments of format parameters to use for</span>
+<span class="sd">        formatting the string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      The formatted string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="s">&#39;dict&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">format_dict</span><span class="p">)</span>
+</div>
+  <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Format.tuple"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Format.tuple">[docs]</a>  <span class="k">def</span> <span class="nf">tuple</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Formats a tuple.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      message: The format string.</span>
+<span class="sd">      *params: The formatting positional parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      The formatted string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="s">&#39;tuple&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+</div>
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_type</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">format_type</span> <span class="o">==</span> <span class="s">&#39;dict&#39;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">message</span> <span class="o">%</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">format_type</span> <span class="o">==</span> <span class="s">&#39;tuple&#39;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">message</span> <span class="o">%</span> <span class="n">params</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Abort</span><span class="p">(</span><span class="s">&#39;Invalid format type: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">format_type</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Log"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Log">[docs]</a><span class="k">class</span> <span class="nc">Log</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Logs a message, just like the Python logging module.&quot;&quot;&quot;</span>
+
+  <span class="c"># TODO: Hack the call stack of the logging message to use the file and line</span>
+  <span class="c"># context from when it was first scheduled, not when it actually ran.</span>
+
+  <span class="n">_log_method</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">log</span>
+
+  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Log</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Log</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Log</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Log</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Log</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Log</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">Log</span><span class="o">.</span><span class="n">_log_method</span><span class="o">.</span><span class="n">im_func</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Delay"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Delay">[docs]</a><span class="k">class</span> <span class="nc">Delay</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Waits N seconds before completion.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    seconds: Keyword argument only. The number of seconds to wait. Will be</span>
+<span class="sd">      rounded to the nearest whole second.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    How long this delay waited.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">async</span> <span class="o">=</span> <span class="bp">True</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;seconds&#39;</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Delay takes one keyword parameter, &quot;seconds&quot;.&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_callback_task</span><span class="p">(</span>
+        <span class="n">countdown</span><span class="o">=</span><span class="n">seconds</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s">&#39;ae-pipeline-delay-&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_id</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">task</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue_name</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">taskqueue</span><span class="o">.</span><span class="n">TombstonedTaskError</span><span class="p">,</span> <span class="n">taskqueue</span><span class="o">.</span><span class="n">TaskAlreadyExistsError</span><span class="p">):</span>
+      <span class="k">pass</span>
+
+  <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Delay pipeline pretending to sleep </span><span class="si">%0.2f</span><span class="s"> seconds&#39;</span><span class="p">,</span> <span class="n">seconds</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;seconds&#39;</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="EmailToContinue"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.EmailToContinue">[docs]</a><span class="k">class</span> <span class="nc">EmailToContinue</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Emails someone asking if the pipeline should continue.</span>
+
+<span class="sd">  When the user clicks &quot;Approve&quot;, the pipeline will return True. When the</span>
+<span class="sd">  user clicks &quot;Disapprove&quot;, the pipeline will return False.</span>
+
+<span class="sd">  Supply normal mail.EmailMessage parameters, plus two additional parameters:</span>
+
+<span class="sd">    approve_html: HTML to show to the user after clicking approve.</span>
+<span class="sd">    disapprove_html: HTML to show to the user after clicking disapprove.</span>
+
+<span class="sd">  Additionally, the &#39;body&#39; and &#39;html&#39; keyword arguments are treated as Python</span>
+<span class="sd">  dictionary templates with the keywords &#39;approval_url&#39; and &#39;disapprove_url&#39;,</span>
+<span class="sd">  which let you place those links in your email however you want (as long</span>
+<span class="sd">  as clicking the links results in a GET request). The approve/disapprove URLs</span>
+<span class="sd">  are relative paths (e.g., &#39;/relative/foo/bar&#39;), so you must connect them to</span>
+<span class="sd">  whatever hostname you actually want users to access the callback on with an</span>
+<span class="sd">  absolute URL.</span>
+
+<span class="sd">  A random token is used to secure the asynchronous action.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">async</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">public_callbacks</span> <span class="o">=</span> <span class="bp">True</span>
+
+  <span class="n">_email_message</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">EmailMessage</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&#39;random_token&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+      <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;random_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%x</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;approve_html&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+      <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;approve_html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;h1&gt;Approved!&lt;/h1&gt;&#39;</span>
+    <span class="k">if</span> <span class="s">&#39;disapprove_html&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+      <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;disapprove_html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;h1&gt;Not Approved!&lt;/h1&gt;&#39;</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">random_token</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;random_token&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;approve_html&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;disapprove_html&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">approve_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_callback_url</span><span class="p">(</span>
+        <span class="n">random_token</span><span class="o">=</span><span class="n">random_token</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s">&#39;approve&#39;</span><span class="p">)</span>
+    <span class="n">disapprove_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_callback_url</span><span class="p">(</span>
+        <span class="n">random_token</span><span class="o">=</span><span class="n">random_token</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s">&#39;disapprove&#39;</span><span class="p">)</span>
+
+    <span class="n">mail_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">mail_args</span><span class="p">[</span><span class="s">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mail_args</span><span class="p">[</span><span class="s">&#39;body&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="p">{</span>
+        <span class="s">&#39;approve_url&#39;</span><span class="p">:</span> <span class="n">approve_url</span><span class="p">,</span>
+        <span class="s">&#39;disapprove_url&#39;</span><span class="p">:</span> <span class="n">disapprove_url</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="s">&#39;html&#39;</span> <span class="ow">in</span> <span class="n">mail_args</span><span class="p">:</span>
+      <span class="n">mail_args</span><span class="p">[</span><span class="s">&#39;html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mail_args</span><span class="p">[</span><span class="s">&#39;html&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="p">{</span>
+        <span class="s">&#39;approve_url&#39;</span><span class="p">:</span> <span class="n">cgi</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">approve_url</span><span class="p">),</span>
+        <span class="s">&#39;disapprove_url&#39;</span><span class="p">:</span> <span class="n">cgi</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">disapprove_url</span><span class="p">),</span>
+      <span class="p">}</span>
+    <span class="n">EmailToContinue</span><span class="o">.</span><span class="n">_email_message</span><span class="o">.</span><span class="n">im_func</span><span class="p">(</span><span class="o">**</span><span class="n">mail_args</span><span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_token</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">random_token</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;random_token&#39;</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;h1&gt;Invalid security token.&lt;/h1&gt;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">&#39;approve&#39;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">return</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;approve_html&#39;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">&#39;disapprove&#39;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+      <span class="k">return</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;disapprove_html&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;h1&gt;Invalid &quot;choice&quot; value.&lt;/h1&gt;&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, some text.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
