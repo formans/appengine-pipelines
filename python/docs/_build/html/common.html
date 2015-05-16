@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pipeline.common &mdash; appengine-pipelines 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="appengine-pipelines 1 documentation" href="index.html" />
+    <link rel="next" title="pipeline.status_ui" href="status_ui.html" />
+    <link rel="prev" title="pipeline.models" href="models.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_ui.html" title="pipeline.status_ui"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="pipeline.models"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">appengine-pipelines 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-pipeline.common">
+<span id="pipeline-common"></span><h1>pipeline.common<a class="headerlink" href="#module-pipeline.common" title="Permalink to this headline">¶</a></h1>
+<p>Common Pipelines for easy reuse.</p>
+<dl class="class">
+<dt id="pipeline.common.AbortIfTrue">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">AbortIfTrue</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#AbortIfTrue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.AbortIfTrue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aborts the entire pipeline if the supplied argument is True.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.All">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">All</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#All"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.All" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if all of the values are True.</p>
+<p>Returns False if there are no values present.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Any">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Any</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Any"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Any" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if any of the values are True.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Append">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Append</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine together values into a list.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><a href="#id1"><span class="problematic" id="id2">*</span></a>args: One or more values.</dd>
+<dt>Returns:</dt>
+<dd>A single list of all values appended to the same list. Length of the
+output list matches the length of the input list.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Complement">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Complement</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Complement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Complement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the boolean complement of the values.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Concat">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Concat</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Concat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Concat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates strings together using a join character.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><a href="#id3"><span class="problematic" id="id4">*</span></a>args: One or more strings.
+separator: Keyword argument only; the string to use to join the args.</dd>
+<dt>Returns:</dt>
+<dd>The joined string.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Delay">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Delay</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waits N seconds before completion.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>seconds: Keyword argument only. The number of seconds to wait. Will be</dt>
+<dd>rounded to the nearest whole second.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>How long this delay waited.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Dict">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Dict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary with the supplied keyword arguments.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.EmailToContinue">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">EmailToContinue</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#EmailToContinue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.EmailToContinue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emails someone asking if the pipeline should continue.</p>
+<p>When the user clicks &#8220;Approve&#8221;, the pipeline will return True. When the
+user clicks &#8220;Disapprove&#8221;, the pipeline will return False.</p>
+<p>Supply normal mail.EmailMessage parameters, plus two additional parameters:</p>
+<blockquote>
+<div>approve_html: HTML to show to the user after clicking approve.
+disapprove_html: HTML to show to the user after clicking disapprove.</div></blockquote>
+<p>Additionally, the &#8216;body&#8217; and &#8216;html&#8217; keyword arguments are treated as Python
+dictionary templates with the keywords &#8216;approval_url&#8217; and &#8216;disapprove_url&#8217;,
+which let you place those links in your email however you want (as long
+as clicking the links results in a GET request). The approve/disapprove URLs
+are relative paths (e.g., &#8216;/relative/foo/bar&#8217;), so you must connect them to
+whatever hostname you actually want users to access the callback on with an
+absolute URL.</p>
+<p>A random token is used to secure the asynchronous action.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Extend">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Extend</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine together lists and tuples into a single list.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><a href="#id5"><span class="problematic" id="id6">*</span></a>args: One or more lists or tuples.</dd>
+<dt>Returns:</dt>
+<dd>A single list of all supplied lists merged together in order. Length of
+the output list is the sum of the lengths of all input lists.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Format">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Format</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats a string with formatting arguments.</p>
+<dl class="classmethod">
+<dt id="pipeline.common.Format.dict">
+<em class="property">classmethod </em><code class="descname">dict</code><span class="sig-paren">(</span><em>message</em>, <em>**format_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Format.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Format.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats a dictionary.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">message: The format string.
+<a href="#id7"><span class="problematic" id="id8">**</span></a>format_dict: Keyword arguments of format parameters to use for</p>
+<blockquote class="last">
+<div>formatting the string.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>The formatted string.</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pipeline.common.Format.tuple">
+<em class="property">classmethod </em><code class="descname">tuple</code><span class="sig-paren">(</span><em>message</em>, <em>*params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Format.tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Format.tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats a tuple.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>message: The format string.
+<a href="#id9"><span class="problematic" id="id10">*</span></a>params: The formatting positional parameters.</dd>
+<dt>Returns:</dt>
+<dd>The formatted string.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Ignore">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Ignore</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Ignore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Ignore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark the supplied parameters as unused outputs of sibling pipelines.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Intersection">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Intersection</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns only those items belonging to all of the supplied lists.</p>
+<p>Each argument must be a list. No individual items are permitted.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.List">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">List</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#List"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.List" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list with the supplied positional arguments.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Log">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Log</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs a message, just like the Python logging module.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Max">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Max</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the max value.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Min">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Min</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the min value.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Multiply">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Multiply</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Multiply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Multiply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all values multiplied together.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Negate">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Negate</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Negate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Negate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns each value supplied multiplied by -1.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Return">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Return</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Return"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Return" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes calling generator to have the supplied default output value.</p>
+<p>Only works when yielded last!</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Sum">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Sum</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sum of all values.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Union">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Union</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like Extend, but the resulting list has all unique elements.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.common.Uniquify">
+<em class="property">class </em><code class="descclassname">pipeline.common.</code><code class="descname">Uniquify</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/common.html#Uniquify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.common.Uniquify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of unique items from the list of items supplied.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="models.html"
+                        title="previous chapter">pipeline.models</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="status_ui.html"
+                        title="next chapter">pipeline.status_ui</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/common.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, some text.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/common.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

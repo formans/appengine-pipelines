@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pipeline.util &mdash; appengine-pipelines 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="appengine-pipelines 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">appengine-pipelines 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pipeline.util</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#</span>
+<span class="c"># Copyright 2010 Google Inc.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Utility functions for use with the Google App Engine Pipeline API.&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;for_name&quot;</span><span class="p">,</span>
+           <span class="s">&quot;JsonEncoder&quot;</span><span class="p">,</span>
+           <span class="s">&quot;JsonDecoder&quot;</span><span class="p">]</span>
+
+<span class="c">#pylint: disable=g-bad-name</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">try</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">json</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">simplejson</span> <span class="kn">as</span> <span class="nn">json</span>
+
+<span class="c"># pylint: disable=protected-access</span>
+
+
+<span class="k">def</span> <span class="nf">_get_task_target</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;Get the default target for a pipeline task.</span>
+
+<span class="sd">  Current version id format is: user_defined_version.minor_version_number</span>
+<span class="sd">  Current module id is just the module&#39;s name. It could be &quot;default&quot;</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A complete target name is of format version.module. If module is the</span>
+<span class="sd">  default module, just version. None if target can not be determined.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c"># Break circular dependency.</span>
+  <span class="c"># pylint: disable=g-import-not-at-top</span>
+  <span class="kn">import</span> <span class="nn">pipeline</span>
+  <span class="k">if</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">_TEST_MODE</span><span class="p">:</span>
+    <span class="k">return</span> <span class="bp">None</span>
+
+  <span class="c"># Further protect against test cases that doesn&#39;t set env vars</span>
+  <span class="c"># propertly.</span>
+  <span class="k">if</span> <span class="p">(</span><span class="s">&quot;CURRENT_VERSION_ID&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">or</span>
+      <span class="s">&quot;CURRENT_MODULE_ID&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">):</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Running Pipeline in non TEST_MODE but important &quot;</span>
+                    <span class="s">&quot;env vars are not set.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">None</span>
+
+  <span class="n">version</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&quot;CURRENT_VERSION_ID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">module</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&quot;CURRENT_MODULE_ID&quot;</span><span class="p">]</span>
+  <span class="k">if</span> <span class="n">module</span> <span class="o">==</span> <span class="s">&quot;default&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">version</span>
+  <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="for_name"><a class="viewcode-back" href="../../util.html#pipeline.util.for_name">[docs]</a><span class="k">def</span> <span class="nf">for_name</span><span class="p">(</span><span class="n">fq_name</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Find class/function/method specified by its fully qualified name.</span>
+
+<span class="sd">  Fully qualified can be specified as:</span>
+<span class="sd">    * &lt;module_name&gt;.&lt;class_name&gt;</span>
+<span class="sd">    * &lt;module_name&gt;.&lt;function_name&gt;</span>
+<span class="sd">    * &lt;module_name&gt;.&lt;class_name&gt;.&lt;method_name&gt; (an unbound method will be</span>
+<span class="sd">      returned in this case).</span>
+
+<span class="sd">  for_name works by doing __import__ for &lt;module_name&gt;, and looks for</span>
+<span class="sd">  &lt;class_name&gt;/&lt;function_name&gt; in module&#39;s __dict__/attrs. If fully qualified</span>
+<span class="sd">  name doesn&#39;t contain &#39;.&#39;, the current module will be used.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    fq_name: fully qualified name of something to find</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    class object.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ImportError: when specified module could not be loaded or the class</span>
+<span class="sd">    was not found in the module.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">fq_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fq_name</span><span class="p">)</span>
+  <span class="n">module_name</span> <span class="o">=</span> <span class="n">__name__</span>
+  <span class="n">short_name</span> <span class="o">=</span> <span class="n">fq_name</span>
+
+  <span class="k">if</span> <span class="n">fq_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">short_name</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fq_name</span><span class="p">[:</span><span class="n">fq_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)],</span>
+                                 <span class="n">fq_name</span><span class="p">[</span><span class="n">fq_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="p">[</span><span class="n">short_name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">short_name</span><span class="p">]</span>
+  <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+    <span class="c"># If we&#39;re recursively inside a for_name() chain, then we want to raise</span>
+    <span class="c"># this error as a key error so we can report the actual source of the</span>
+    <span class="c"># problem. If we&#39;re *not* recursively being called, that means the</span>
+    <span class="c"># module was found and the specific item could not be loaded, and thus</span>
+    <span class="c"># we want to raise an ImportError directly.</span>
+    <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+      <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&quot;Could not find &#39;</span><span class="si">%s</span><span class="s">&#39; on path &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">short_name</span><span class="p">,</span> <span class="n">module_name</span><span class="p">))</span>
+  <span class="k">except</span> <span class="ne">ImportError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c"># module_name is not actually a module. Try for_name for it to figure</span>
+    <span class="c"># out what&#39;s this.</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">module</span> <span class="o">=</span> <span class="n">for_name</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">short_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">short_name</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c"># The module was found, but the function component is missing.</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&quot;Could not find &#39;</span><span class="si">%s</span><span class="s">&#39; on path &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">short_name</span><span class="p">,</span> <span class="n">module_name</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+      <span class="c"># This means recursive import attempts failed, thus we will raise the</span>
+      <span class="c"># first ImportError we encountered, since it&#39;s likely the most accurate.</span>
+      <span class="k">pass</span>
+    <span class="c"># Raise the original import error that caused all of this, since it is</span>
+    <span class="c"># likely the real cause of the overall problem.</span>
+    <span class="k">raise</span>
+
+</div>
+<span class="k">def</span> <span class="nf">is_generator_function</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Return true if the object is a user-defined generator function.</span>
+
+<span class="sd">  Generator function objects provides same attributes as functions.</span>
+<span class="sd">  See isfunction.__doc__ for attributes listing.</span>
+
+<span class="sd">  Adapted from Python 2.6.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    obj: an object to test.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    true if the object is generator function.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">CO_GENERATOR</span> <span class="o">=</span> <span class="mh">0x20</span>
+  <span class="k">return</span> <span class="nb">bool</span><span class="p">(((</span><span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="ow">and</span>
+               <span class="n">obj</span><span class="o">.</span><span class="n">func_code</span><span class="o">.</span><span class="n">co_flags</span> <span class="o">&amp;</span> <span class="n">CO_GENERATOR</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="JsonEncoder"><a class="viewcode-back" href="../../util.html#pipeline.util.JsonEncoder">[docs]</a><span class="k">class</span> <span class="nc">JsonEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Pipeline customized json encoder.&quot;&quot;&quot;</span>
+
+  <span class="n">TYPE_ID</span> <span class="o">=</span> <span class="s">&quot;__pipeline_json_type&quot;</span>
+
+<div class="viewcode-block" id="JsonEncoder.default"><a class="viewcode-back" href="../../util.html#pipeline.util.JsonEncoder.default">[docs]</a>  <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inherit docs.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_TYPE_TO_ENCODER</span><span class="p">:</span>
+      <span class="n">encoder</span> <span class="o">=</span> <span class="n">_TYPE_TO_ENCODER</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)]</span>
+      <span class="n">json_struct</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+      <span class="n">json_struct</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TYPE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span>
+      <span class="k">return</span> <span class="n">json_struct</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">JsonEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="JsonDecoder"><a class="viewcode-back" href="../../util.html#pipeline.util.JsonDecoder">[docs]</a><span class="k">class</span> <span class="nc">JsonDecoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecoder</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Pipeline customized json decoder.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&quot;object_hook&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+      <span class="n">kwargs</span><span class="p">[</span><span class="s">&quot;object_hook&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict_to_obj</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">JsonDecoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_dict_to_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a dictionary of json object to a Python object.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">JsonEncoder</span><span class="o">.</span><span class="n">TYPE_ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">d</span>
+
+    <span class="n">type_name</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">JsonEncoder</span><span class="o">.</span><span class="n">TYPE_ID</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_name</span> <span class="ow">in</span> <span class="n">_TYPE_NAME_TO_DECODER</span><span class="p">:</span>
+      <span class="n">decoder</span> <span class="o">=</span> <span class="n">_TYPE_NAME_TO_DECODER</span><span class="p">[</span><span class="n">type_name</span><span class="p">]</span>
+      <span class="k">return</span> <span class="n">decoder</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Invalid type </span><span class="si">%s</span><span class="s">.&quot;</span><span class="p">,</span> <span class="n">type_name</span><span class="p">)</span>
+
+</div>
+<span class="n">_DATETIME_FORMAT</span> <span class="o">=</span> <span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M:%S.</span><span class="si">%f</span><span class="s">&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_json_encode_datetime</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Json encode a datetime object.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    o: a datetime object.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    A dict of json primitives.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="p">{</span><span class="s">&quot;isostr&quot;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">_DATETIME_FORMAT</span><span class="p">)}</span>
+
+
+<span class="k">def</span> <span class="nf">_json_decode_datetime</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Converts a dict of json primitives to a datetime object.&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;isostr&quot;</span><span class="p">],</span> <span class="n">_DATETIME_FORMAT</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_register_json_primitive</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Extend what Pipeline can serialize.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    object_type: type of the object.</span>
+<span class="sd">    encoder: a function that takes in an object and returns</span>
+<span class="sd">      a dict of json primitives.</span>
+<span class="sd">    decoder: inverse function of encoder.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">global</span> <span class="n">_TYPE_TO_ENCODER</span>
+  <span class="k">global</span> <span class="n">_TYPE_NAME_TO_DECODER</span>
+  <span class="k">if</span> <span class="n">object_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TYPE_TO_ENCODER</span><span class="p">:</span>
+    <span class="n">_TYPE_TO_ENCODER</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">encoder</span>
+    <span class="n">_TYPE_NAME_TO_DECODER</span><span class="p">[</span><span class="n">object_type</span><span class="o">.</span><span class="n">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">decoder</span>
+
+
+<span class="n">_TYPE_TO_ENCODER</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_TYPE_NAME_TO_DECODER</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_register_json_primitive</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+                         <span class="n">_json_encode_datetime</span><span class="p">,</span>
+                         <span class="n">_json_decode_datetime</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, some text.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

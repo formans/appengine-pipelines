@@ -12,6 +12,11 @@ Contents:
    :maxdepth: 2
 
    pipeline
+   models
+   common
+   status_ui
+   util
+
 
 Indices and tables
 ==================

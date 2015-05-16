@@ -13,6 +13,10 @@ Contents:
 
    pipeline
    models
+   common
+   status_ui
+   util
+
 
 Indices and tables
 ==================

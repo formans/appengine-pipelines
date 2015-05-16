@@ -79,7 +79,7 @@
 <span class="kn">import</span> <span class="nn">pipeline</span>
 
 
-<div class="viewcode-block" id="Return"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Return">[docs]</a><span class="k">class</span> <span class="nc">Return</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Return"><a class="viewcode-back" href="../../common.html#pipeline.common.Return">[docs]</a><span class="k">class</span> <span class="nc">Return</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Causes calling generator to have the supplied default output value.</span>
 
 <span class="sd">  Only works when yielded last!</span>
@@ -89,28 +89,28 @@
     <span class="k">return</span> <span class="n">return_value</span>
 
 </div>
-<div class="viewcode-block" id="Ignore"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Ignore">[docs]</a><span class="k">class</span> <span class="nc">Ignore</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Ignore"><a class="viewcode-back" href="../../common.html#pipeline.common.Ignore">[docs]</a><span class="k">class</span> <span class="nc">Ignore</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Mark the supplied parameters as unused outputs of sibling pipelines.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="k">pass</span>
 
 </div>
-<div class="viewcode-block" id="Dict"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Dict">[docs]</a><span class="k">class</span> <span class="nc">Dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Dict"><a class="viewcode-back" href="../../common.html#pipeline.common.Dict">[docs]</a><span class="k">class</span> <span class="nc">Dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns a dictionary with the supplied keyword arguments.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="List"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.List">[docs]</a><span class="k">class</span> <span class="nc">List</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="List"><a class="viewcode-back" href="../../common.html#pipeline.common.List">[docs]</a><span class="k">class</span> <span class="nc">List</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns a list with the supplied positional arguments.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="AbortIfTrue"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.AbortIfTrue">[docs]</a><span class="k">class</span> <span class="nc">AbortIfTrue</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="AbortIfTrue"><a class="viewcode-back" href="../../common.html#pipeline.common.AbortIfTrue">[docs]</a><span class="k">class</span> <span class="nc">AbortIfTrue</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Aborts the entire pipeline if the supplied argument is True.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
@@ -118,7 +118,7 @@
       <span class="k">raise</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Abort</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="All"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.All">[docs]</a><span class="k">class</span> <span class="nc">All</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="All"><a class="viewcode-back" href="../../common.html#pipeline.common.All">[docs]</a><span class="k">class</span> <span class="nc">All</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns True if all of the values are True.</span>
 
 <span class="sd">  Returns False if there are no values present.</span>
@@ -133,7 +133,7 @@
     <span class="k">return</span> <span class="bp">True</span>
 
 </div>
-<div class="viewcode-block" id="Any"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Any">[docs]</a><span class="k">class</span> <span class="nc">Any</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Any"><a class="viewcode-back" href="../../common.html#pipeline.common.Any">[docs]</a><span class="k">class</span> <span class="nc">Any</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns True if any of the values are True.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -143,7 +143,7 @@
     <span class="k">return</span> <span class="bp">False</span>
 
 </div>
-<div class="viewcode-block" id="Complement"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Complement">[docs]</a><span class="k">class</span> <span class="nc">Complement</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Complement"><a class="viewcode-back" href="../../common.html#pipeline.common.Complement">[docs]</a><span class="k">class</span> <span class="nc">Complement</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns the boolean complement of the values.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -153,7 +153,7 @@
       <span class="k">return</span> <span class="p">[</span><span class="ow">not</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
 
 </div>
-<div class="viewcode-block" id="Max"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Max">[docs]</a><span class="k">class</span> <span class="nc">Max</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Max"><a class="viewcode-back" href="../../common.html#pipeline.common.Max">[docs]</a><span class="k">class</span> <span class="nc">Max</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns the max value.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -165,7 +165,7 @@
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Min"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Min">[docs]</a><span class="k">class</span> <span class="nc">Min</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Min"><a class="viewcode-back" href="../../common.html#pipeline.common.Min">[docs]</a><span class="k">class</span> <span class="nc">Min</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns the min value.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -177,7 +177,7 @@
     <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Sum"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Sum">[docs]</a><span class="k">class</span> <span class="nc">Sum</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Sum"><a class="viewcode-back" href="../../common.html#pipeline.common.Sum">[docs]</a><span class="k">class</span> <span class="nc">Sum</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns the sum of all values.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -189,7 +189,7 @@
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Multiply"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Multiply">[docs]</a><span class="k">class</span> <span class="nc">Multiply</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Multiply"><a class="viewcode-back" href="../../common.html#pipeline.common.Multiply">[docs]</a><span class="k">class</span> <span class="nc">Multiply</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns all values multiplied together.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -204,7 +204,7 @@
     <span class="k">return</span> <span class="n">total</span>
 
 </div>
-<div class="viewcode-block" id="Negate"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Negate">[docs]</a><span class="k">class</span> <span class="nc">Negate</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Negate"><a class="viewcode-back" href="../../common.html#pipeline.common.Negate">[docs]</a><span class="k">class</span> <span class="nc">Negate</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns each value supplied multiplied by -1.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -219,7 +219,7 @@
       <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
 
 </div>
-<div class="viewcode-block" id="Extend"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Extend">[docs]</a><span class="k">class</span> <span class="nc">Extend</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Extend"><a class="viewcode-back" href="../../common.html#pipeline.common.Extend">[docs]</a><span class="k">class</span> <span class="nc">Extend</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Combine together lists and tuples into a single list.</span>
 
 <span class="sd">  Args:</span>
@@ -237,7 +237,7 @@
     <span class="k">return</span> <span class="n">combined</span>
 
 </div>
-<div class="viewcode-block" id="Append"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Append">[docs]</a><span class="k">class</span> <span class="nc">Append</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Append"><a class="viewcode-back" href="../../common.html#pipeline.common.Append">[docs]</a><span class="k">class</span> <span class="nc">Append</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Combine together values into a list.</span>
 
 <span class="sd">  Args:</span>
@@ -255,7 +255,7 @@
     <span class="k">return</span> <span class="n">combined</span>
 
 </div>
-<div class="viewcode-block" id="Concat"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Concat">[docs]</a><span class="k">class</span> <span class="nc">Concat</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Concat"><a class="viewcode-back" href="../../common.html#pipeline.common.Concat">[docs]</a><span class="k">class</span> <span class="nc">Concat</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Concatenates strings together using a join character.</span>
 
 <span class="sd">  Args:</span>
@@ -271,7 +271,7 @@
     <span class="k">return</span> <span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Union"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Union">[docs]</a><span class="k">class</span> <span class="nc">Union</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Union"><a class="viewcode-back" href="../../common.html#pipeline.common.Union">[docs]</a><span class="k">class</span> <span class="nc">Union</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Like Extend, but the resulting list has all unique elements.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -281,7 +281,7 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Intersection"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Intersection">[docs]</a><span class="k">class</span> <span class="nc">Intersection</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Intersection"><a class="viewcode-back" href="../../common.html#pipeline.common.Intersection">[docs]</a><span class="k">class</span> <span class="nc">Intersection</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns only those items belonging to all of the supplied lists.</span>
 
 <span class="sd">  Each argument must be a list. No individual items are permitted.</span>
@@ -296,18 +296,18 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Uniquify"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Uniquify">[docs]</a><span class="k">class</span> <span class="nc">Uniquify</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Uniquify"><a class="viewcode-back" href="../../common.html#pipeline.common.Uniquify">[docs]</a><span class="k">class</span> <span class="nc">Uniquify</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Returns a list of unique items from the list of items supplied.&quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
 
 </div>
-<div class="viewcode-block" id="Format"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Format">[docs]</a><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Format"><a class="viewcode-back" href="../../common.html#pipeline.common.Format">[docs]</a><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Formats a string with formatting arguments.&quot;&quot;&quot;</span>
 
   <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Format.dict"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Format.dict">[docs]</a>  <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">format_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Format.dict"><a class="viewcode-back" href="../../common.html#pipeline.common.Format.dict">[docs]</a>  <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">format_dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Formats a dictionary.</span>
 
 <span class="sd">    Args:</span>
@@ -321,7 +321,7 @@
     <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="s">&#39;dict&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">format_dict</span><span class="p">)</span>
 </div>
   <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Format.tuple"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Format.tuple">[docs]</a>  <span class="k">def</span> <span class="nf">tuple</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="Format.tuple"><a class="viewcode-back" href="../../common.html#pipeline.common.Format.tuple">[docs]</a>  <span class="k">def</span> <span class="nf">tuple</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Formats a tuple.</span>
 
 <span class="sd">    Args:</span>
@@ -342,7 +342,7 @@
       <span class="k">raise</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Abort</span><span class="p">(</span><span class="s">&#39;Invalid format type: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">format_type</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Log"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Log">[docs]</a><span class="k">class</span> <span class="nc">Log</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Log"><a class="viewcode-back" href="../../common.html#pipeline.common.Log">[docs]</a><span class="k">class</span> <span class="nc">Log</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Logs a message, just like the Python logging module.&quot;&quot;&quot;</span>
 
   <span class="c"># TODO: Hack the call stack of the logging message to use the file and line</span>
@@ -378,7 +378,7 @@
     <span class="n">Log</span><span class="o">.</span><span class="n">_log_method</span><span class="o">.</span><span class="n">im_func</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="Delay"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.Delay">[docs]</a><span class="k">class</span> <span class="nc">Delay</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="Delay"><a class="viewcode-back" href="../../common.html#pipeline.common.Delay">[docs]</a><span class="k">class</span> <span class="nc">Delay</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Waits N seconds before completion.</span>
 
 <span class="sd">  Args:</span>
@@ -413,7 +413,7 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;seconds&#39;</span><span class="p">])</span>
 
 </div>
-<div class="viewcode-block" id="EmailToContinue"><a class="viewcode-back" href="../../pipeline.html#pipeline.common.EmailToContinue">[docs]</a><span class="k">class</span> <span class="nc">EmailToContinue</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<div class="viewcode-block" id="EmailToContinue"><a class="viewcode-back" href="../../common.html#pipeline.common.EmailToContinue">[docs]</a><span class="k">class</span> <span class="nc">EmailToContinue</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Emails someone asking if the pipeline should continue.</span>
 
 <span class="sd">  When the user clicks &quot;Approve&quot;, the pipeline will return True. When the</span>
