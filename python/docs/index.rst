@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    pipeline
+   models
 
 Indices and tables
 ==================
