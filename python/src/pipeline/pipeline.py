@@ -60,11 +60,11 @@ import util as mr_util
 # pylint: disable=protected-access
 
 # For convenience
-_BarrierIndex = models._BarrierIndex
-_BarrierRecord = models._BarrierRecord
-_PipelineRecord = models._PipelineRecord
-_SlotRecord = models._SlotRecord
-_StatusRecord = models._StatusRecord
+_BarrierIndex = models.BarrierIndex
+_BarrierRecord = models.BarrierRecord
+_PipelineRecord = models.PipelineRecord
+_SlotRecord = models.SlotRecord
+_StatusRecord = models.StatusRecord
 
 
 # Overall TODOs:
