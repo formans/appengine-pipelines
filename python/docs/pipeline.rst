@@ -1,12 +1,8 @@
 
-Hello there!
-================
+pipeline.pipeline
+====================
 
 
 .. automodule:: pipeline.pipeline
-   :members:
-
-
-.. automodule:: pipeline.models
    :members:
 
