@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pipeline.status_ui &mdash; appengine-pipelines 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="appengine-pipelines 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">appengine-pipelines 1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pipeline.status_ui</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#</span>
+<span class="c"># Copyright 2010 Google Inc.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Status UI for Google App Engine Pipeline API.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pkgutil</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">users</span>
+<span class="kn">from</span> <span class="nn">google.appengine.ext</span> <span class="kn">import</span> <span class="n">webapp</span>
+
+<span class="k">try</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">json</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">simplejson</span> <span class="kn">as</span> <span class="nn">json</span>
+
+<span class="c"># Relative imports</span>
+<span class="kn">import</span> <span class="nn">util</span>
+
+
+<div class="viewcode-block" id="StatusUiHandler"><a class="viewcode-back" href="../../status_ui.html#pipeline.status_ui.StatusUiHandler">[docs]</a><span class="k">class</span> <span class="nc">StatusUiHandler</span><span class="p">(</span><span class="n">webapp</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Render the status UI.&quot;&quot;&quot;</span>
+
+  <span class="n">_RESOURCE_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;/status&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/status.html&#39;</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/status.css&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/status.css&#39;</span><span class="p">,</span> <span class="s">&#39;text/css&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/status.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/status.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/list&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/root_list.html&#39;</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/list.css&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/root_list.css&#39;</span><span class="p">,</span> <span class="s">&#39;text/css&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/list.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/root_list.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/common.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/common.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/common.css&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/common.css&#39;</span><span class="p">,</span> <span class="s">&#39;text/css&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery-1.4.2.min.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/jquery-1.4.2.min.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery.treeview.min.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/jquery.treeview.min.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery.cookie.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/jquery.cookie.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery.timeago.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/jquery.timeago.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery.ba-hashchange.min.js&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/jquery.ba-hashchange.min.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery.json.min.js&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/jquery.json.min.js&#39;</span><span class="p">,</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/jquery.treeview.css&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/jquery.treeview.css&#39;</span><span class="p">,</span> <span class="s">&#39;text/css&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/treeview-default.gif&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/images/treeview-default.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/treeview-default-line.gif&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/images/treeview-default-line.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/treeview-black.gif&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;ui/images/treeview-black.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/treeview-black-line.gif&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/images/treeview-black-line.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/images/treeview-default.gif&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/images/treeview-default.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/images/treeview-default-line.gif&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/images/treeview-default-line.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/images/treeview-black.gif&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/images/treeview-black.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+    <span class="s">&#39;/images/treeview-black-line.gif&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s">&#39;ui/images/treeview-black-line.gif&#39;</span><span class="p">,</span> <span class="s">&#39;image/gif&#39;</span><span class="p">),</span>
+  <span class="p">}</span>
+
+  <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pipeline</span>  <span class="c"># Break circular dependency</span>
+    <span class="k">if</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">_ENFORCE_AUTH</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">users</span><span class="o">.</span><span class="n">get_current_user</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;User is not logged in&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">create_login_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">))</span>
+        <span class="k">return</span>
+
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">users</span><span class="o">.</span><span class="n">is_current_user_admin</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;User is not admin: </span><span class="si">%r</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">.</span><span class="n">get_current_user</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Forbidden&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">resource</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RESOURCE_MAP</span><span class="p">:</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Could not find: </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;Resource not found.&quot;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;text/plain&#39;</span>
+      <span class="k">return</span>
+
+    <span class="n">relative_path</span><span class="p">,</span> <span class="n">content_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RESOURCE_MAP</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="n">relative_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">_DEBUG</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&quot;Cache-Control&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;public, max-age=300&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&quot;Content-Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">content_type</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c"># Python &lt; 2.6.</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span> <span class="ow">or</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+</div>
+<div class="viewcode-block" id="BaseRpcHandler"><a class="viewcode-back" href="../../status_ui.html#pipeline.status_ui.BaseRpcHandler">[docs]</a><span class="k">class</span> <span class="nc">BaseRpcHandler</span><span class="p">(</span><span class="n">webapp</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Base handler for JSON-RPC responses.</span>
+
+<span class="sd">  Sub-classes should fill in the &#39;json_response&#39; property. All exceptions will</span>
+<span class="sd">  be returned.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pipeline</span>  <span class="c"># Break circular dependency</span>
+    <span class="k">if</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">_ENFORCE_AUTH</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">users</span><span class="o">.</span><span class="n">is_current_user_admin</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;User is not admin: </span><span class="si">%r</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">.</span><span class="n">get_current_user</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Forbidden&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c"># XSRF protection</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">_DEBUG</span> <span class="ow">and</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;X-Requested-With&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;XMLHttpRequest&#39;</span><span class="p">):</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Request missing X-Requested-With header&#39;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Request missing X-Requested-With header&#39;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+      <span class="k">return</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">util</span><span class="o">.</span><span class="n">JsonEncoder</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="p">[</span><span class="s">&#39;error_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="p">[</span><span class="s">&#39;error_message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="p">[</span><span class="s">&#39;error_traceback&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">util</span><span class="o">.</span><span class="n">JsonEncoder</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;application/json&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Control&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;no-cache&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;To be implemented by sub-classes.&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="TreeStatusHandler"><a class="viewcode-back" href="../../status_ui.html#pipeline.status_ui.TreeStatusHandler">[docs]</a><span class="k">class</span> <span class="nc">TreeStatusHandler</span><span class="p">(</span><span class="n">BaseRpcHandler</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;RPC handler for getting the status of all children of root pipeline.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pipeline</span>  <span class="c"># Break circular dependency</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">get_status_tree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;root_pipeline_id&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="ClassPathListHandler"><a class="viewcode-back" href="../../status_ui.html#pipeline.status_ui.ClassPathListHandler">[docs]</a><span class="k">class</span> <span class="nc">ClassPathListHandler</span><span class="p">(</span><span class="n">BaseRpcHandler</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;RPC handler for getting the list of all Pipeline classes defined.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pipeline</span>  <span class="c"># Break circular dependency</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="p">[</span><span class="s">&#39;classPaths&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_pipeline_names</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="RootListHandler"><a class="viewcode-back" href="../../status_ui.html#pipeline.status_ui.RootListHandler">[docs]</a><span class="k">class</span> <span class="nc">RootListHandler</span><span class="p">(</span><span class="n">BaseRpcHandler</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;RPC handler for getting the status of all root pipelines.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pipeline</span>  <span class="c"># Break circular dependency</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">json_response</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">get_root_list</span><span class="p">(</span>
+            <span class="n">class_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;class_path&#39;</span><span class="p">),</span>
+            <span class="n">cursor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cursor&#39;</span><span class="p">)))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, some text.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -59,6 +59,38 @@
   <div class="section" id="module-pipeline.status_ui">
 <span id="pipeline-status-ui"></span><h1>pipeline.status_ui<a class="headerlink" href="#module-pipeline.status_ui" title="Permalink to this headline">¶</a></h1>
 <p>Status UI for Google App Engine Pipeline API.</p>
+<dl class="class">
+<dt id="pipeline.status_ui.BaseRpcHandler">
+<em class="property">class </em><code class="descclassname">pipeline.status_ui.</code><code class="descname">BaseRpcHandler</code><a class="reference internal" href="_modules/pipeline/status_ui.html#BaseRpcHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.status_ui.BaseRpcHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base handler for JSON-RPC responses.</p>
+<p>Sub-classes should fill in the &#8216;json_response&#8217; property. All exceptions will
+be returned.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.status_ui.ClassPathListHandler">
+<em class="property">class </em><code class="descclassname">pipeline.status_ui.</code><code class="descname">ClassPathListHandler</code><a class="reference internal" href="_modules/pipeline/status_ui.html#ClassPathListHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.status_ui.ClassPathListHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>RPC handler for getting the list of all Pipeline classes defined.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.status_ui.RootListHandler">
+<em class="property">class </em><code class="descclassname">pipeline.status_ui.</code><code class="descname">RootListHandler</code><a class="reference internal" href="_modules/pipeline/status_ui.html#RootListHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.status_ui.RootListHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>RPC handler for getting the status of all root pipelines.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.status_ui.StatusUiHandler">
+<em class="property">class </em><code class="descclassname">pipeline.status_ui.</code><code class="descname">StatusUiHandler</code><a class="reference internal" href="_modules/pipeline/status_ui.html#StatusUiHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.status_ui.StatusUiHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the status UI.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.status_ui.TreeStatusHandler">
+<em class="property">class </em><code class="descclassname">pipeline.status_ui.</code><code class="descname">TreeStatusHandler</code><a class="reference internal" href="_modules/pipeline/status_ui.html#TreeStatusHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.status_ui.TreeStatusHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>RPC handler for getting the status of all children of root pipeline.</p>
+</dd></dl>
+
 </div>
 
 

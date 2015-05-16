@@ -28,7 +28,7 @@ except ImportError:
 import util
 
 
-class _PipelineRecord(db.Model):
+class PipelineRecord(db.Model):
   """Represents a Pipeline.
 
   Key name is a randomly assigned UUID. No parent entity.
@@ -117,7 +117,7 @@ class _PipelineRecord(db.Model):
     return self._params_decoded
 
 
-class _SlotRecord(db.Model):
+class SlotRecord(db.Model):
   """Represents an output slot.
 
   Key name is a randomly assigned UUID. No parent for slots of child pipelines.
@@ -135,8 +135,8 @@ class _SlotRecord(db.Model):
   FILLED = 'filled'
   WAITING = 'waiting'
 
-  root_pipeline = db.ReferenceProperty(_PipelineRecord)
-  filler = db.ReferenceProperty(_PipelineRecord,
+  root_pipeline = db.ReferenceProperty(PipelineRecord)
+  filler = db.ReferenceProperty(PipelineRecord,
                                 collection_name='filled_slots_set')
 
   # One of these two will be set, depending on the size of the value.
@@ -167,7 +167,7 @@ class _SlotRecord(db.Model):
     return self._value_decoded
 
 
-class _BarrierRecord(db.Model):
+class BarrierRecord(db.Model):
   """Represents a barrier.
 
   Key name is the purpose of the barrier (START or FINALIZE). Parent entity
@@ -191,8 +191,8 @@ class _BarrierRecord(db.Model):
   FINALIZE = 'finalize'
   ABORT = 'abort'
 
-  root_pipeline = db.ReferenceProperty(_PipelineRecord)
-  target = db.ReferenceProperty(_PipelineRecord,
+  root_pipeline = db.ReferenceProperty(PipelineRecord)
+  target = db.ReferenceProperty(PipelineRecord,
                                 collection_name='called_barrier_set')
   blocking_slots = db.ListProperty(db.Key)
   trigger_time = db.DateTimeProperty(indexed=False)
@@ -204,7 +204,7 @@ class _BarrierRecord(db.Model):
     return '_AE_Pipeline_Barrier'
 
 
-class _BarrierIndex(db.Model):
+class BarrierIndex(db.Model):
   """Indicates a _BarrierRecord that is dependent on a slot.
 
   Previously, when a _SlotRecord was filled, notify_barriers() would query for
@@ -241,7 +241,7 @@ class _BarrierIndex(db.Model):
   """
 
   # Enable this entity to be cleaned up.
-  root_pipeline = db.ReferenceProperty(_PipelineRecord)
+  root_pipeline = db.ReferenceProperty(PipelineRecord)
 
   @classmethod
   def kind(cls):
@@ -271,7 +271,7 @@ class _BarrierIndex(db.Model):
     return db.Key.from_path(*barrier_record_path)
 
 
-class _StatusRecord(db.Model):
+class StatusRecord(db.Model):
   """Represents the current status of a pipeline.
 
   Properties:
@@ -282,7 +282,7 @@ class _StatusRecord(db.Model):
     status_time: When the status was written.
   """
 
-  root_pipeline = db.ReferenceProperty(_PipelineRecord)
+  root_pipeline = db.ReferenceProperty(PipelineRecord)
   message = db.TextProperty()
   console_url = db.TextProperty()
   link_names = db.ListProperty(db.Text, indexed=False)

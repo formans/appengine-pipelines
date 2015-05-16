@@ -33,7 +33,7 @@ except ImportError:
 import util
 
 
-class _StatusUiHandler(webapp.RequestHandler):
+class StatusUiHandler(webapp.RequestHandler):
   """Render the status UI."""
 
   _RESOURCE_MAP = {
@@ -102,7 +102,7 @@ class _StatusUiHandler(webapp.RequestHandler):
     self.response.out.write(data or open(path, 'rb').read())
 
 
-class _BaseRpcHandler(webapp.RequestHandler):
+class BaseRpcHandler(webapp.RequestHandler):
   """Base handler for JSON-RPC responses.
 
   Sub-classes should fill in the 'json_response' property. All exceptions will
@@ -146,7 +146,7 @@ class _BaseRpcHandler(webapp.RequestHandler):
     raise NotImplementedError('To be implemented by sub-classes.')
 
 
-class _TreeStatusHandler(_BaseRpcHandler):
+class TreeStatusHandler(BaseRpcHandler):
   """RPC handler for getting the status of all children of root pipeline."""
 
   def handle(self):
@@ -155,7 +155,7 @@ class _TreeStatusHandler(_BaseRpcHandler):
         pipeline.get_status_tree(self.request.get('root_pipeline_id')))
 
 
-class _ClassPathListHandler(_BaseRpcHandler):
+class ClassPathListHandler(BaseRpcHandler):
   """RPC handler for getting the list of all Pipeline classes defined."""
 
   def handle(self):
@@ -163,7 +163,7 @@ class _ClassPathListHandler(_BaseRpcHandler):
     self.json_response['classPaths'] = pipeline.get_pipeline_names()
 
 
-class _RootListHandler(_BaseRpcHandler):
+class RootListHandler(BaseRpcHandler):
   """RPC handler for getting the status of all root pipelines."""
 
   def handle(self):
