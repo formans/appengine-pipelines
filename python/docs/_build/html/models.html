@@ -56,9 +56,141 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-pipeline.models">
-<span id="pipeline-models"></span><h1>pipeline.models<a class="headerlink" href="#module-pipeline.models" title="Permalink to this headline">¶</a></h1>
-<p>Datastore models used by the Google App Engine Pipeline API.</p>
+  <div class="section" id="pipeline-models">
+<h1>pipeline.models<a class="headerlink" href="#pipeline-models" title="Permalink to this headline">¶</a></h1>
+<p>Please note that these classes appear with an underscore in front of their names
+in the actual source.  This is one of the manglings done to make the docs render
+as Sphinx will ignore module members with the leading underscore.</p>
+<span class="target" id="module-pipeline.models"></span><p>Datastore models used by the Google App Engine Pipeline API.</p>
+<dl class="class">
+<dt id="pipeline.models.BarrierIndex">
+<em class="property">class </em><code class="descclassname">pipeline.models.</code><code class="descname">BarrierIndex</code><a class="reference internal" href="_modules/pipeline/models.html#BarrierIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.models.BarrierIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a _BarrierRecord that is dependent on a slot.</p>
+<p>Previously, when a _SlotRecord was filled, notify_barriers() would query for
+all _BarrierRecords where the &#8216;blocking_slots&#8217; property equals the
+_SlotRecord&#8217;s key. The problem with that approach is the &#8216;blocking_slots&#8217;
+index is eventually consistent, meaning _BarrierRecords that were just written
+will not match the query. When pipelines are created and barriers are notified
+in rapid succession, the inconsistent queries can cause certain barriers never
+to fire. The outcome is a pipeline is WAITING and never RUN, even though all
+of its dependent slots have been filled.</p>
+<p>This entity is used to make it so barrier fan-out is fully consistent
+with the High Replication Datastore. It&#8217;s used by notify_barriers() to
+do fully consistent ancestor queries every time a slot is filled. This
+ensures that even all _BarrierRecords dependent on a _SlotRecord will
+be found regardless of eventual consistency.</p>
+<p>The key path for _BarrierIndexes is this for root entities:</p>
+<blockquote>
+<div>_PipelineRecord&lt;owns_slot_id&gt;/_SlotRecord&lt;slot_id&gt;/_PipelineRecord&lt;dependent_pipeline_id&gt;/_BarrierIndex&lt;purpose&gt;</div></blockquote>
+<p>And this for child pipelines:</p>
+<blockquote>
+<div>_SlotRecord&lt;slot_id&gt;/_PipelineRecord&lt;dependent_pipeline_id&gt;/_BarrierIndex&lt;purpose&gt;</div></blockquote>
+<p>That path is translated to the _BarrierRecord it should fire:</p>
+<blockquote>
+<div>_PipelineRecord&lt;dependent_pipeline_id&gt;/_BarrierRecord&lt;purpose&gt;</div></blockquote>
+<p>All queries for _BarrierIndexes are key-only and thus the model requires
+no properties or helper methods.</p>
+<dl class="classmethod">
+<dt id="pipeline.models.BarrierIndex.to_barrier_key">
+<em class="property">classmethod </em><code class="descname">to_barrier_key</code><span class="sig-paren">(</span><em>barrier_index_key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pipeline/models.html#BarrierIndex.to_barrier_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.models.BarrierIndex.to_barrier_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a _BarrierIndex key to a _BarrierRecord key.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>barrier_index_key: db.Key for a _BarrierIndex entity.</dd>
+<dt>Returns:</dt>
+<dd>db.Key for the corresponding _BarrierRecord entity.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.models.BarrierRecord">
+<em class="property">class </em><code class="descclassname">pipeline.models.</code><code class="descname">BarrierRecord</code><a class="reference internal" href="_modules/pipeline/models.html#BarrierRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.models.BarrierRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a barrier.</p>
+<p>Key name is the purpose of the barrier (START or FINALIZE). Parent entity
+is the _PipelineRecord the barrier should trigger when all of its
+blocking_slots are filled.</p>
+<p>Properties:</p>
+<blockquote>
+<div><p>root_pipeline: The root of the workflow.</p>
+<p>target: The pipeline to run when the barrier fires.</p>
+<p>blocking_slots: The slots that must be filled before this barrier fires.</p>
+<p>trigger_time: When this barrier fired.</p>
+<p>status: The current status of the barrier.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.models.PipelineRecord">
+<em class="property">class </em><code class="descclassname">pipeline.models.</code><code class="descname">PipelineRecord</code><a class="reference internal" href="_modules/pipeline/models.html#PipelineRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.models.PipelineRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Pipeline.</p>
+<p>Key name is a randomly assigned UUID. No parent entity.</p>
+<p>Properties:</p>
+<blockquote>
+<div><p>class_path: Path of the Python class to use for this pipeline.</p>
+<p>root_pipeline: The root of the whole workflow; set to itself this pipeline is its own root.</p>
+<p>fanned_out: List of child _PipelineRecords that were started when this generator pipeline moved from WAITING to RUN.</p>
+<p>start_time: For pipelines with no start _BarrierRecord, when this pipeline was enqueued to run immediately.</p>
+<p>finalized_time: When this pipeline moved from WAITING or RUN to DONE.</p>
+<p>params: Serialized parameter dictionary.</p>
+<p>status: The current status of the pipeline.</p>
+<p>current_attempt: The current attempt (starting at 0) to run.</p>
+<p>max_attempts: Maximum number of attempts (starting at 0) to run.</p>
+<p>next_retry_time: ETA of the next retry attempt.</p>
+<p>retry_message: Why the last attempt failed; None or empty if no message.</p>
+</div></blockquote>
+<p>Root pipeline properties:</p>
+<blockquote>
+<div><p>is_root_pipeline: This is a root pipeline.</p>
+<p>abort_message: Why the whole pipeline was aborted; only saved on root pipelines.</p>
+<p>abort_requested: If an abort signal has been requested for this root pipeline; only saved on root pipelines</p>
+</div></blockquote>
+<dl class="attribute">
+<dt id="pipeline.models.PipelineRecord.params">
+<code class="descname">params</code><a class="headerlink" href="#pipeline.models.PipelineRecord.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dictionary of parameters for this Pipeline.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.models.SlotRecord">
+<em class="property">class </em><code class="descclassname">pipeline.models.</code><code class="descname">SlotRecord</code><a class="reference internal" href="_modules/pipeline/models.html#SlotRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.models.SlotRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents an output slot.</p>
+<p>Key name is a randomly assigned UUID. No parent for slots of child pipelines.
+For the outputs of root pipelines, the parent entity is the root
+_PipelineRecord (see Pipeline.start()).</p>
+<p>Properties:</p>
+<blockquote>
+<div><p>root_pipeline: The root of the workflow.</p>
+<p>filler: The pipeline that filled this slot.</p>
+<p>value: Serialized value for this slot.</p>
+<p>status: The current status of the slot.</p>
+<p>fill_time: When the slot was filled by the filler.</p>
+</div></blockquote>
+<dl class="attribute">
+<dt id="pipeline.models.SlotRecord.value">
+<code class="descname">value</code><a class="headerlink" href="#pipeline.models.SlotRecord.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of this Slot.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pipeline.models.StatusRecord">
+<em class="property">class </em><code class="descclassname">pipeline.models.</code><code class="descname">StatusRecord</code><a class="reference internal" href="_modules/pipeline/models.html#StatusRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pipeline.models.StatusRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents the current status of a pipeline.</p>
+<p>Properties:</p>
+<blockquote>
+<div><p>message: The textual message to show.</p>
+<p>console_url: URL to iframe as the primary console for this pipeline.</p>
+<p>link_names: Human display names for status links.</p>
+<p>link_urls: URLs corresponding to human names for status links.</p>
+<p>status_time: When the status was written.</p>
+</div></blockquote>
+</dd></dl>
+
 </div>
 
 

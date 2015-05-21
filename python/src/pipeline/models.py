@@ -34,27 +34,36 @@ class PipelineRecord(db.Model):
   Key name is a randomly assigned UUID. No parent entity.
 
   Properties:
+
     class_path: Path of the Python class to use for this pipeline.
-    root_pipeline: The root of the whole workflow; set to itself this pipeline
-      is its own root.
-    fanned_out: List of child _PipelineRecords that were started when this
-      generator pipeline moved from WAITING to RUN.
-    start_time: For pipelines with no start _BarrierRecord, when this pipeline
-      was enqueued to run immediately.
+
+    root_pipeline: The root of the whole workflow; set to itself this pipeline is its own root.
+
+    fanned_out: List of child _PipelineRecords that were started when this generator pipeline moved from WAITING to RUN.
+
+    start_time: For pipelines with no start _BarrierRecord, when this pipeline was enqueued to run immediately.
+
     finalized_time: When this pipeline moved from WAITING or RUN to DONE.
+
     params: Serialized parameter dictionary.
+
     status: The current status of the pipeline.
+
     current_attempt: The current attempt (starting at 0) to run.
+
     max_attempts: Maximum number of attempts (starting at 0) to run.
+
     next_retry_time: ETA of the next retry attempt.
+
     retry_message: Why the last attempt failed; None or empty if no message.
 
   Root pipeline properties:
+
     is_root_pipeline: This is a root pipeline.
-    abort_message: Why the whole pipeline was aborted; only saved on
-      root pipelines.
-    abort_requested: If an abort signal has been requested for this root
-      pipeline; only saved on root pipelines
+
+    abort_message: Why the whole pipeline was aborted; only saved on root pipelines.
+
+    abort_requested: If an abort signal has been requested for this root pipeline; only saved on root pipelines
   """
 
   WAITING = 'waiting'
@@ -125,10 +134,15 @@ class SlotRecord(db.Model):
   _PipelineRecord (see Pipeline.start()).
 
   Properties:
+
     root_pipeline: The root of the workflow.
+
     filler: The pipeline that filled this slot.
+
     value: Serialized value for this slot.
+
     status: The current status of the slot.
+
     fill_time: When the slot was filled by the filler.
   """
 
@@ -175,10 +189,15 @@ class BarrierRecord(db.Model):
   blocking_slots are filled.
 
   Properties:
+
     root_pipeline: The root of the workflow.
+
     target: The pipeline to run when the barrier fires.
+
     blocking_slots: The slots that must be filled before this barrier fires.
+
     trigger_time: When this barrier fired.
+
     status: The current status of the barrier.
   """
 
@@ -224,13 +243,11 @@ class BarrierIndex(db.Model):
 
   The key path for _BarrierIndexes is this for root entities:
 
-    _PipelineRecord<owns_slot_id>/_SlotRecord<slot_id>/
-        _PipelineRecord<dependent_pipeline_id>/_BarrierIndex<purpose>
+    _PipelineRecord<owns_slot_id>/_SlotRecord<slot_id>/_PipelineRecord<dependent_pipeline_id>/_BarrierIndex<purpose>
 
   And this for child pipelines:
 
-    _SlotRecord<slot_id>/_PipelineRecord<dependent_pipeline_id>/
-        _BarrierIndex<purpose>
+    _SlotRecord<slot_id>/_PipelineRecord<dependent_pipeline_id>/_BarrierIndex<purpose>
 
   That path is translated to the _BarrierRecord it should fire:
 
@@ -275,10 +292,15 @@ class StatusRecord(db.Model):
   """Represents the current status of a pipeline.
 
   Properties:
+
     message: The textual message to show.
+
     console_url: URL to iframe as the primary console for this pipeline.
+
     link_names: Human display names for status links.
+
     link_urls: URLs corresponding to human names for status links.
+
     status_time: When the status was written.
   """
 
